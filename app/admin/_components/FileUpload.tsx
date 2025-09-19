@@ -87,9 +87,19 @@ const FileUpload: React.FC<FileUploadProps> = ({
             const errorText = await res.text();
             errorMessage = errorText || `HTTP ${res.status}: ${res.statusText}`;
           } catch {
-            errorMessage = `HTTP ${res.status}: ${res.statusText}`;
+            if (res.status === 413) {
+              errorMessage = "File too large. Maximum size is 50MB for images and videos.";
+            } else {
+              errorMessage = `HTTP ${res.status}: ${res.statusText}`;
+            }
           }
         }
+
+        // Special handling for 413 errors
+        if (res.status === 413) {
+          errorMessage = "File too large. Please reduce the file size. Maximum: 50MB for images and videos.";
+        }
+
         throw new Error(errorMessage);
       }
 

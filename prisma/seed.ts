@@ -143,25 +143,25 @@ async function main() {
     const galleryImages = [
         {
             category: 'Exterior',
-            url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',
+            url: 'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill,q_auto/sample.jpg',
             publicId: 'hotel-exterior-1',
             caption: 'Hotel Front View',
         },
         {
             category: 'Rooms',
-            url: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800&q=80',
+            url: 'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill,q_auto/hotel-room',
             publicId: 'hotel-room-1',
             caption: 'AC Single Bed Room',
         },
         {
             category: 'Amenities',
-            url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+            url: 'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill,q_auto/sample_2.jpg',
             publicId: 'hotel-amenities-1',
             caption: 'Reception Area',
         },
         {
             category: 'Exterior',
-            url: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80',
+            url: 'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill,q_auto/sample_3.jpg',
             publicId: 'hotel-exterior-night',
             caption: 'Hotel Night View',
         },

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { v2 as cloudinary } from 'cloudinary'
 
+// Use Edge Runtime for larger file uploads
+export const runtime = 'nodejs' // Using nodejs runtime for better file handling
+
 // Configure Cloudinary with environment variables
 cloudinary.config({
     cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -34,6 +37,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 })
         }
 
+        // Updated file size limits for high-resolution content
+        const maxImageSize = 50 * 1024 * 1024; // 50MB for high-res images
+        const maxVideoSize = 50 * 1024 * 1024; // 50MB for videos
+
+        if (file.size > maxImageSize) {
+            return NextResponse.json({
+                error: `File too large. Maximum size is 50MB. Your file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
+            }, { status: 413 });
+        }
+
         // Validate file type - allow both images and videos for room management
         const isImage = file.type.startsWith('image/')
         const isVideo = file.type.startsWith('video/')
@@ -43,14 +56,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Additional validation for videos
-        if (isVideo) {
-            // Check file size (approximate check for 60s video limit)
-            const maxVideoSize = 50 * 1024 * 1024 // 50MB (rough estimate for 60s video)
-            if (file.size > maxVideoSize) {
-                return NextResponse.json({
-                    error: 'Video file too large. Please ensure video is under 60 seconds.'
-                }, { status: 400 })
-            }
+        if (isVideo && file.size > maxVideoSize) {
+            return NextResponse.json({
+                error: `Video file too large. Maximum size is 50MB. Your file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
+            }, { status: 413 })
         }
 
         // Convert file to buffer
