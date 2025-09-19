@@ -1,12 +1,14 @@
 import Layout from "@/components/Layout";
 import CategoryCard from "@/components/CategoryCard";
+import prisma from "@/lib/prisma";
+import type { JsonValue } from "@prisma/client/runtime/library";
 
 interface Category {
   id: number;
   slug: string;
   title: string;
   description: string | null;
-  specs: Record<string, boolean>;
+  specs: JsonValue;
   essentialAmenities?: string[];
   bedType?: string | null;
   maxOccupancy?: number | null;
@@ -27,21 +29,46 @@ interface Category {
 
 async function getCategories() {
   try {
-    const response = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-      }/api/categories`,
-      {
-        next: { revalidate: 300 },
-      }
-    );
+    const categories = await prisma.hotelCategory.findMany({
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        description: true,
+        specs: true,
+        essentialAmenities: true,
+        bedType: true,
+        maxOccupancy: true,
+        roomSize: true,
+        videoUrl: true,
+        roomCount: true,
+        images: {
+          select: {
+            id: true,
+            url: true,
+            caption: true,
+          },
+          orderBy: {
+            createdAt: 'asc'
+          }
+        },
+        prices: {
+          select: {
+            id: true,
+            hourlyHours: true,
+            rateCents: true,
+          },
+          orderBy: {
+            hourlyHours: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        title: 'asc',
+      },
+    });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch categories");
-    }
-
-    const data = await response.json();
-    return data.data || [];
+    return categories;
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];
@@ -78,7 +105,12 @@ export default async function RoomsPage() {
                       className="animate-fade-in-up w-full max-w-md mx-auto"
                       style={{ animationDelay: `${index * 200}ms` }}
                     >
-                      <CategoryCard category={category} />
+                      <CategoryCard
+                        category={{
+                          ...category,
+                          specs: (category.specs as Record<string, boolean>) || {}
+                        }}
+                      />
                     </div>
                   ))}
                 </div>
